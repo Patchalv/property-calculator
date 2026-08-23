@@ -1,0 +1,133 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/karla';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+@import 'tailwindcss';
+
+/*
+  "The notebook and the paperwork."
+
+  The body of this page is a warm household notebook: two people working out
+  whether they can afford a flat. The warnings are the official paperwork that
+  keeps interrupting it — an Order, a Law, an appraiser.
+
+  --stamp is the ONLY cold colour in the palette and it appears ONLY in warning
+  slabs. That single rule is what makes the tonal break work: nothing else on
+  the page is allowed to look like the law.
+*/
+@theme {
+  --color-paper: #fdfbf7; /* barely-tinted warm ground */
+  --color-sunk: #f5efe4; /* sunken warm panel — inputs, ledger stripes */
+  --color-ink: #3a2230; /* deep warm oxblood — body text, never black */
+  --color-ink-soft: #7a6472;
+  --color-rule: #e6dbcd;
+  --color-rule-firm: #cfbfab;
+
+  --color-gold: #d98a1f; /* saffron — cash leaving your hands */
+  --color-gold-soft: #fbedd3;
+  --color-verde: #2f6f5e; /* verdigris — money coming back */
+  --color-verde-soft: #dcebe5;
+
+  --color-stamp: #16202e; /* WARNINGS ONLY */
+  --color-stamp-ink: #f2f4f7;
+
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Karla Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    /* A faint warm tooth, so the ground reads as paper rather than as #fff. */
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgb(58 34 48 / 0.035) 1px,
+      transparent 0
+    );
+    background-size: 22px 22px;
+  }
+
+  /* Fraunces has a soft/wonk axis. Using it is the point — a Didone would be
+     the default answer and would read as cold. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 40, 'WONK' 1, 'opsz' 40;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+
+  /* Every money figure is tabular. Columns of euros must align on the decimal
+     or the ledger is unreadable. */
+  .figure {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.03em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* The eyebrow marks a section of the notebook. Utility face, never display. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  /*
+    The paperwork. Deliberately foreign to everything above: cold ink, zero
+    radius, monospace, tight leading, a hard rule down the side like a stamped
+    marginal note. Do not soften these.
+  */
+  .stamp {
+    background-color: var(--color-stamp);
+    color: var(--color-stamp-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    border-radius: 0;
+    border-left: 6px solid var(--color-gold);
+  }
+
+  .stamp-quiet {
+    background-color: transparent;
+    color: var(--color-stamp);
+    border: 1px solid var(--color-stamp);
+    border-left-width: 6px;
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+}

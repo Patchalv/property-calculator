@@ -74,9 +74,19 @@ export function buildTimeline(
     .filter((l) => !preCompletion.has(l.key))
     .reduce<Money>((acc, l) => add(acc, asMoney(l)), exact(purchaseTax(inputs.price, inputs.propertyType)))
 
+  // The label has to track the refund's sign. Below 90% LTV nothing comes back
+  // and there is a shortfall to find instead, so "less the arras refund" would
+  // describe the opposite of what happens.
+  const completionLabel =
+    c.refund > 0
+      ? 'Completion — taxes and fees, less the arras refund'
+      : c.refund === 0
+        ? 'Completion — taxes and fees, nothing refunded'
+        : 'Completion — taxes and fees, plus the shortfall on the loan'
+
   rows.push({
     key: 'completion',
-    label: 'Completion — taxes and fees, less the arras refund',
+    label: completionLabel,
     stage: 'completion',
     delta: add(atCompletion, exact(-c.refund)),
   })

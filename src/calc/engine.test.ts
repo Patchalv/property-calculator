@@ -194,3 +194,17 @@ describe('arras expressed in euros', () => {
     expect(r.requirement.low).toBe(42_000)
   })
 })
+
+describe('completion row label tracks the refund', () => {
+  it('says the deposit comes back only when it does', () => {
+    expect(at({ price: 390_000, ltv: 1 }).timeline.find((r) => r.key === 'completion')?.label).toContain(
+      'less the arras refund',
+    )
+    expect(at({ price: 390_000, ltv: 0.9 }).timeline.find((r) => r.key === 'completion')?.label).toContain(
+      'nothing refunded',
+    )
+    expect(at({ price: 390_000, ltv: 0.8 }).timeline.find((r) => r.key === 'completion')?.label).toContain(
+      'shortfall',
+    )
+  })
+})
