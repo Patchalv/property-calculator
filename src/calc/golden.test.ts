@@ -11,38 +11,48 @@ import { calculate } from './index'
 import { DEFAULT_COSTS, DEFAULT_INPUTS } from './constants'
 import type { Inputs, Ltv, PropertyType } from './types'
 
-/** Fixed settings for the golden table: 100% LTV, 10% arras, €2,000 float, lawyer off, resale. */
+/**
+ * Fixed settings for the golden table: 100% LTV, 10% arras, €2,000 float,
+ * lawyer off, resale. `independentLawyer` is pinned explicitly rather than
+ * inherited from `DEFAULT_INPUTS` — the UI's own default is a household
+ * choice that can change independently of this fixture, and this table must
+ * not drift with it.
+ */
 function goldenInputs(price: number, over: Partial<Inputs> = {}): Inputs {
-  return { ...DEFAULT_INPUTS, price, ...over }
+  return { ...DEFAULT_INPUTS, price, independentLawyer: false, ...over }
 }
 
 const at = (price: number, over: Partial<Inputs> = {}) =>
   calculate(goldenInputs(price, over), DEFAULT_COSTS, new Date('2026-08-23T00:00:00Z'))
 
 describe('golden: allIn and requirement', () => {
-  it('€330,000 — allIn is 31,045 – 39,440', () => {
+  it('€330,000 — allIn is 31,045 – 33,440', () => {
     const r = at(330_000)
     expect(Math.round(r.allIn.low)).toBe(31_045)
-    expect(Math.round(r.allIn.high)).toBe(39_440)
+    expect(Math.round(r.allIn.high)).toBe(33_440)
   })
 
-  it('€330,000 — requirement is 35,000 – 39,440, and the low bound is EXACT', () => {
+  // Both bounds are exact now, not just the low one: shrinking appliances
+  // and decorating from ranges to points (see MOVING_COSTS in constants.ts)
+  // removed what used to push the high bound above the arras+float floor, so
+  // the floor now binds on both ends and the range collapses to one figure.
+  it('€330,000 — requirement is exactly 35,000, both bounds', () => {
     const r = at(330_000)
     // arras + float, unambiguous arithmetic. Not a tolerance.
     expect(r.requirement.low).toBe(35_000)
-    expect(Math.round(r.requirement.high)).toBe(39_440)
+    expect(Math.round(r.requirement.high)).toBe(35_000)
   })
 
-  it('€390,000 — allIn is 34,645 – 43,040', () => {
+  it('€390,000 — allIn is 34,645 – 37,040', () => {
     const r = at(390_000)
     expect(Math.round(r.allIn.low)).toBe(34_645)
-    expect(Math.round(r.allIn.high)).toBe(43_040)
+    expect(Math.round(r.allIn.high)).toBe(37_040)
   })
 
-  it('€390,000 — requirement is 41,000 – 43,040, and the low bound is EXACT', () => {
+  it('€390,000 — requirement is exactly 41,000, both bounds', () => {
     const r = at(390_000)
     expect(r.requirement.low).toBe(41_000)
-    expect(Math.round(r.requirement.high)).toBe(43_040)
+    expect(Math.round(r.requirement.high)).toBe(41_000)
   })
 
   it('at the low bound the ARRAS binds, not the cost of the transaction', () => {
@@ -80,13 +90,13 @@ describe('golden: refund collapse at €390,000, 10% arras', () => {
 })
 
 describe('golden: appraisal stress test at €390,000, 100% LTV', () => {
-  it('loan falls to 351,000, refund goes to zero, requirement jumps to 73,645 – 82,040', () => {
+  it('loan falls to 351,000, refund goes to zero, requirement jumps to 73,645 – 76,040', () => {
     const r = at(390_000, { stressAppraisal: true })
     expect(r.appraisal).toBe(351_000)
     expect(r.loan).toBe(351_000)
     expect(r.refund).toBe(0)
     expect(Math.round(r.requirement.low)).toBe(73_645)
-    expect(Math.round(r.requirement.high)).toBe(82_040)
+    expect(Math.round(r.requirement.high)).toBe(76_040)
   })
 
   it('lands on the 73,700–82,000 figure estimated before the refund mechanic was understood', () => {
@@ -142,9 +152,9 @@ describe('golden: transaction-cost totals against the published note', () => {
 })
 
 describe('golden: moving costs', () => {
-  it('totals 9,730 – 16,580', () => {
+  it('totals 9,730 – 10,580', () => {
     const r = at(330_000)
     expect(r.movingCosts.low).toBe(9_730)
-    expect(r.movingCosts.high).toBe(16_580)
+    expect(r.movingCosts.high).toBe(10_580)
   })
 })

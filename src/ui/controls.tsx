@@ -30,7 +30,7 @@ export function Field({
 }
 
 const inputBase =
-  'figure w-full border border-rule-firm bg-paper px-3 py-2 text-[1.0625rem] text-ink placeholder:text-ink-soft/50 focus:border-ink focus:outline-none'
+  'figure h-11 w-full border border-rule-firm bg-paper px-3 text-[1.0625rem] text-ink placeholder:text-ink-soft/50 focus:border-ink focus:outline-none'
 
 export function EuroInput({
   id,
@@ -131,7 +131,7 @@ export function Segmented<T extends string | number>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="flex border border-rule-firm"
+      className="flex h-11 border border-rule-firm"
     >
       {options.map((o, i) => {
         const active = i === selected
@@ -143,7 +143,7 @@ export function Segmented<T extends string | number>({
             aria-checked={active}
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(o.value)}
-            className={`flex-1 px-2 py-2 text-[0.8125rem] font-semibold transition-colors ${
+            className={`flex flex-1 items-center justify-center px-2 text-[0.8125rem] font-semibold transition-colors ${
               i > 0 ? 'border-l border-rule-firm' : ''
             } ${active ? 'bg-ink text-paper' : 'bg-paper text-ink-soft hover:bg-sunk'}`}
           >

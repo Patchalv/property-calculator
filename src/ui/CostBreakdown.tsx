@@ -87,6 +87,9 @@ export function CostBreakdown({
   const shownTransaction = costs.transaction.filter(
     (l) => l.key !== 'lawyer' || inputs.independentLawyer,
   )
+  // Appliances and decorating are set from the sidebar now, as exact figures
+  // rather than a range to argue with — see MOVING_COSTS in constants.ts.
+  const shownMoving = costs.moving.filter((l) => l.key !== 'appliances' && l.key !== 'decorating')
 
   return (
     <div className="space-y-6">
@@ -139,9 +142,13 @@ export function CostBreakdown({
           </tr>
         </thead>
         <tbody>
-          <LineRows lines={costs.moving} onEdit={(k, b, v) => onEdit('moving', k, b, v)} />
+          <LineRows lines={shownMoving} onEdit={(k, b, v) => onEdit('moving', k, b, v)} />
         </tbody>
       </table>
+      <p className="text-[0.8125rem] text-ink-soft">
+        Appliances and furniture, and paint and floors, are set from the sidebar instead — exact
+        figures, not a range.
+      </p>
 
       <div className="flex items-baseline justify-between gap-4">
         <p className="text-[0.8125rem] text-ink-soft">

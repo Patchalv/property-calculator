@@ -22,7 +22,9 @@ describe('timeline shape', () => {
   })
 
   it('starts with the arras and ends with the moving items', () => {
-    const rows = at().timeline
+    // Price pinned explicitly — this is a structural check on the timeline
+    // shape, not a claim about whatever DEFAULT_INPUTS.price happens to be.
+    const rows = at({ price: 330_000 }).timeline
     expect(rows[0]?.key).toBe('arras')
     expect(rows[0]?.delta.low).toBe(33_000)
     expect(rows.at(-1)?.stage).toBe('moving')
@@ -43,11 +45,13 @@ describe('timeline shape', () => {
 
   it('splitting gestoría out leaves every golden figure unchanged', () => {
     // Guards the planning decision: the split is presentational, not numeric.
-    const r = at({ price: 330_000 })
+    // Lawyer pinned off — DEFAULT_INPUTS.independentLawyer is a household
+    // default that can change independently of this golden fixture.
+    const r = at({ price: 330_000, independentLawyer: false })
     expect(r.allIn.low).toBe(31_045)
-    expect(r.allIn.high).toBe(39_440)
+    expect(r.allIn.high).toBe(33_440)
     expect(r.requirement.low).toBe(35_000)
-    expect(r.requirement.high).toBe(39_440)
+    expect(r.requirement.high).toBe(35_000)
   })
 })
 
@@ -124,7 +128,9 @@ describe('appraisal caps the loan', () => {
 
 describe('savings countdown', () => {
   it('reaches the requirement in whole months from today', () => {
-    const r = at({ price: 330_000, currentSavings: 12_000, patrickMonthly: 500 })
+    // jennyMonthly pinned to 0 — DEFAULT_INPUTS carries a real figure now,
+    // and this arithmetic must not silently start depending on it.
+    const r = at({ price: 330_000, currentSavings: 12_000, patrickMonthly: 500, jennyMonthly: 0 })
     // (35,000 − 12,000) / 500 = 46 exactly → 46 months from 2026-08
     expect(r.toRequirement.low.months).toBe(46)
     expect(r.toRequirement.low.reachable).toBe(true)
@@ -146,7 +152,10 @@ describe('savings countdown', () => {
   })
 
   it('sums both saving rates into one monthly figure', () => {
-    const solo = at({ price: 330_000, currentSavings: 0, patrickMonthly: 1_400 })
+    // jennyMonthly pinned to 0 in the "solo" case — otherwise this would
+    // silently test against DEFAULT_INPUTS's real figure instead of one
+    // person's rate in isolation.
+    const solo = at({ price: 330_000, currentSavings: 0, patrickMonthly: 1_400, jennyMonthly: 0 })
     const joint = at({ price: 330_000, currentSavings: 0, patrickMonthly: 800, jennyMonthly: 600 })
     expect(joint.toRequirement.low.months).toBe(solo.toRequirement.low.months)
   })

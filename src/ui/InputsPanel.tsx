@@ -1,4 +1,4 @@
-import type { ArrasMode, Inputs, Ltv, PropertyType } from '../calc/types'
+import type { ArrasMode, CostConstants, Inputs, Ltv, PropertyType } from '../calc/types'
 import { formatEuros } from '../format'
 import { EuroInput, Field, Segmented, Toggle } from './controls'
 import { Gloss } from './Gloss'
@@ -9,11 +9,24 @@ const PRICE_MAX = 700_000
 export function InputsPanel({
   inputs,
   set,
+  costs,
+  onEditCost,
 }: {
   inputs: Inputs
   set: <K extends keyof Inputs>(key: K, value: Inputs[K]) => void
+  costs: CostConstants
+  onEditCost: (group: 'transaction' | 'moving', key: string, bound: 'low' | 'high', value: number) => void
 }) {
   const monthly = inputs.patrickMonthly + inputs.jennyMonthly
+
+  /** These two are points, not ranges — every change sets both bounds at once
+      so `low === high` never drifts apart. */
+  const setPointCost = (key: string) => (n: number) => {
+    onEditCost('moving', key, 'low', n)
+    onEditCost('moving', key, 'high', n)
+  }
+  const appliances = costs.moving.find((l) => l.key === 'appliances')
+  const decorating = costs.moving.find((l) => l.key === 'decorating')
 
   /** Switching unit converts the figure so the arras itself does not jump. */
   const changeArrasMode = (mode: ArrasMode) => {
@@ -123,18 +136,49 @@ export function InputsPanel({
           <EuroInput label="Current savings, combined" value={inputs.currentSavings} onChange={(n) => set('currentSavings', n)} />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Patrick — monthly">
-            <EuroInput label="Patrick, saved per month" value={inputs.patrickMonthly} onChange={(n) => set('patrickMonthly', n)} step={25} />
-          </Field>
-          <Field label="Jenny — monthly">
-            <EuroInput label="Jenny, saved per month" value={inputs.jennyMonthly} onChange={(n) => set('jennyMonthly', n)} step={25} />
-          </Field>
+        {/*
+          A real grid, not two stacked Fields side by side: "Patrick — monthly"
+          wraps to two lines at this column width while "Jenny — monthly" fits
+          on one, and two independent flex columns would let that push only
+          Patrick's input down. Sharing grid rows keeps both inputs level
+          regardless of which label wraps.
+        */}
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+          <p className="eyebrow">Patrick — monthly</p>
+          <p className="eyebrow">Jenny — monthly</p>
+          <EuroInput label="Patrick, saved per month" value={inputs.patrickMonthly} onChange={(n) => set('patrickMonthly', n)} step={25} />
+          <EuroInput label="Jenny, saved per month" value={inputs.jennyMonthly} onChange={(n) => set('jennyMonthly', n)} step={25} />
         </div>
 
         <p className="figure text-[0.8125rem] text-ink-soft">
           Saving {formatEuros(monthly)} a month between you.
         </p>
+      </div>
+
+      <div className="space-y-4 border-t border-rule pt-6">
+        <p className="eyebrow">Moving-in costs you control</p>
+
+        {appliances && (
+          <Field label="Appliances and furniture gaps">
+            <EuroInput
+              label="Appliances and furniture gaps, in euros"
+              value={appliances.low}
+              onChange={setPointCost('appliances')}
+              step={250}
+            />
+          </Field>
+        )}
+
+        {decorating && (
+          <Field label="Paint and floors">
+            <EuroInput
+              label="Paint and floors, in euros"
+              value={decorating.low}
+              onChange={setPointCost('decorating')}
+              step={250}
+            />
+          </Field>
+        )}
       </div>
 
       <div className="border-t border-rule pt-6">

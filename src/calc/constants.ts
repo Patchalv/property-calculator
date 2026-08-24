@@ -114,13 +114,21 @@ export const PRE_COMPLETION_KEYS = ['tasacion', 'gestoria'] as const
 
 /**
  * Source: Cash Required to Complete. Assumes part-furnished, light work only,
- * and one month of rent overlap. Totals 9,730 – 16,580.
+ * and one month of rent overlap. Totals 9,730 – 10,580.
+ *
+ * `appliances` and `decorating` are POINTS, not ranges — `low === high` on
+ * both, deliberately. Every other line here is a researched estimate argued
+ * with in the "Argue with these" table; these two are edited directly from
+ * the sidebar instead, because the couple wants to enter what they actually
+ * expect to spend rather than a range to negotiate with. See CLAUDE.md's
+ * departures list — unlike the other two, this one is numerically
+ * load-bearing: it moves six golden figures.
  */
 export const MOVING_COSTS: readonly CostLine[] = [
   { key: 'removals', label: 'Removals incl. montamuebles', low: 450, high: 1_050 },
   { key: 'utilities', label: 'Utility altas', low: 100, high: 200 },
-  { key: 'appliances', label: 'Appliances and furniture gaps', low: 5_000, high: 8_000 },
-  { key: 'decorating', label: 'Paint and floors', low: 3_000, high: 6_000 },
+  { key: 'appliances', label: 'Appliances and furniture gaps', low: 5_000, high: 5_000 },
+  { key: 'decorating', label: 'Paint and floors', low: 3_000, high: 3_000 },
   { key: 'rentOverlap', label: 'One month rent overlap', low: 1_030, high: 1_030 },
   { key: 'misc', label: 'Locks, padrón, misc', low: 150, high: 300 },
 ]
@@ -135,26 +143,31 @@ export const DEFAULT_COSTS: CostConstants = {
 // ---------------------------------------------------------------------------
 
 /**
- * Savings and both monthly rates ship at ZERO, deliberately.
+ * Current savings ships at ZERO, deliberately.
  *
- * The PRD's own defaults are the household's real balance and real saving
- * rates. This repo is intended to be public so GitHub Pages is free; committing
- * those figures would publish the household's finances permanently into git
- * history, contradicting the PRD's own rule that nothing about the balance
- * should leave the browser. Type them in; they are never persisted.
+ * The PRD's own default is the household's real balance. This repo is
+ * intended to be public so GitHub Pages is free; committing that figure
+ * would publish the balance permanently into git history, contradicting the
+ * PRD's own rule that nothing about the balance should leave the browser.
+ * Type it in; it is never persisted.
  *
- * Do not restore the PRD's figures here, and do not quote them in a comment.
+ * Do not restore the PRD's figure here, and do not quote it in a comment.
+ *
+ * `patrickMonthly` and `jennyMonthly` are the one deliberate exception: both
+ * are real monthly saving rates, committed here by explicit household
+ * decision rather than left at zero. See CLAUDE.md's privacy section for the
+ * carve-out — do not extend this exception to `currentSavings`.
  */
 export const DEFAULT_INPUTS: Inputs = {
-  price: 330_000,
+  price: 350_000,
   propertyType: 'resale',
   ltv: 1,
   arrasMode: 'percent',
   arrasValue: 10,
   float: 2_000,
   currentSavings: 0,
-  patrickMonthly: 0,
-  jennyMonthly: 0,
-  independentLawyer: false,
+  patrickMonthly: 1_800,
+  jennyMonthly: 1_227.27,
+  independentLawyer: true,
   stressAppraisal: false,
 }

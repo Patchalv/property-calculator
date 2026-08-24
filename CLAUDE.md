@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Built and passing. [PRD — Cash to Buy Calculator.md](PRD%20—%20Cash%20to%20Buy%20Calculator.md) remains the authoritative spec; read it before changing behaviour. This file summarises only what is load-bearing.
 
-Local git repo, no remote yet. Creating the public repo and enabling Pages is deliberately left to the user — see the privacy note below.
+Public on GitHub at `Patchalv/property-calculator`, deployed via GitHub Pages at https://patchalv.github.io/property-calculator/. Since the repo is public, the privacy note below is not theoretical — anything committed here is live.
 
 ## Stack
 
@@ -22,7 +22,9 @@ npx vitest run -t "<test name>"
 
 ## Personal data must stay out of this repo
 
-The PRD's input defaults are the household's real savings balance and saving rates. **`DEFAULT_INPUTS` ships them as zero instead** — the repo is intended to be public so Pages is free, and committing them would publish the household's finances permanently into git history, contradicting the PRD's own rule that nothing about the balance leaves the browser. Do not "restore the PRD defaults", do not quote the figures in comments, and do not use them as test fixtures.
+The PRD's input defaults are the household's real savings balance and saving rates. **`DEFAULT_INPUTS.currentSavings` ships as zero** — the repo is intended to be public so Pages is free, and committing it would publish the household's balance permanently into git history, contradicting the PRD's own rule that nothing about the balance leaves the browser. Do not "restore the PRD default" for it, do not quote the figure in a comment, and do not use it as a test fixture.
+
+**`patrickMonthly` and `jennyMonthly` are a deliberate exception**, committed as real figures by explicit household decision — unlike the balance, a monthly saving rate was judged not sensitive enough to justify the friction of re-typing it every session. Don't extend this reasoning to `currentSavings` on your own initiative. Existing tests that need a *specific* monthly rate (e.g. exact month-count arithmetic) pin the other partner's rate to `0` explicitly rather than relying on whatever the current default happens to be — see `engine.test.ts`'s savings-countdown tests.
 
 **The PRD file itself still contains them.** It is tracked in this repo, so it must be removed, gitignored, or redacted before the repo is made public — otherwise zeroing the defaults achieves nothing.
 
@@ -38,10 +40,11 @@ Build the cash-flow timeline first; `peakCash`, `allIn`, and the headline `requi
 
 Three things the PRD leaves implicit that the golden tests pin down. Any other reading breaks them: **tasación is its own timeline row and is excluded from the completion lump**, **home insurance sits inside the completion lump**, and **moving costs are the final rows**. AJD's "bands" threshold-select a flat rate; they do not slice marginally.
 
-Two deliberate departures from the PRD, both load-bearing:
+Three deliberate departures from the PRD:
 
 - **Gestoría has its own pre-completion timeline row.** The float exists because the provisión de fondos falls due days before completion, and the PRD's lumped timeline could not show that. Numerically inert against every golden figure.
 - **The independent lawyer costs €1,000–€2,500, not €0–€2,500.** A zero floor left `requirement.low` identical whether or not a lawyer was engaged. No golden test touches it.
+- **Appliances and furniture, and paint and floors, are point estimates (`low === high`), not ranges — edited from the sidebar, not the "Argue with these" table.** The household wanted to enter what they actually expect to spend on these two rather than argue with a researched range. Unlike the two departures above, **this one is numerically load-bearing**: it moves `movingCosts`, `allIn`, and `requirement` at both golden prices, and collapses `requirement` to a single exact figure at both price points instead of a low–high range (see below).
 
 Anything whose wording depends on the refund's sign must track it. Below 90% LTV the refund is zero or negative, and copy that still says the deposit comes back — the completion row label, the waterfall's colour and caption, the peak-vs-net cards — misleads in exactly the direction this app exists to prevent.
 
@@ -60,7 +63,7 @@ Spanish terms (arras, ITP, IVA+AJD, tasación, gestoría) are defined in the PRD
 
 The PRD's tables reproduce figures from the source vault; they make the engine verifiable rather than merely plausible. Two things to know before debugging a mismatch:
 
-- `requirement.low` must be **exact**: €35,000 at €330,000 and €41,000 at €390,000. These are `arras + float` and the arithmetic is unambiguous.
+- `requirement.low` must be **exact**: €35,000 at €330,000 and €41,000 at €390,000. These are `arras + float` and the arithmetic is unambiguous. Under the golden fixture (lawyer off — see `goldenInputs` in `golden.test.ts`) `requirement.high` lands on the same two figures too: the arras+float floor binds on both bounds, because collapsing appliances/decorating to points removed what used to push the high bound above it. That collapse is a consequence of the fixture's moving-cost defaults, not a general invariant — it does **not** hold at `DEFAULT_INPUTS`, where the lawyer is on by default and its own €1,000–2,500 range reopens a gap above the floor. The golden fixture pins `independentLawyer: false` explicitly for exactly this reason: so this table stays stable independent of whatever the app's own default is.
 - The PRD's published *transaction-cost totals* do not decompose from a single consistent set of component ranges — they disagree by €50–60. **Trust the components; allow ±€150 against the published totals.** Do not "fix" this.
 
 ## Editorial line

@@ -86,7 +86,7 @@ export function App() {
           <ResultsHeadline {...panel} />
         </div>
         <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
-          <InputsPanel inputs={inputs} set={set} />
+          <InputsPanel inputs={inputs} set={set} costs={costs} onEditCost={editCost} />
         </div>
         <div className="lg:col-start-2 lg:row-start-2">
           <ResultsDetail {...panel} />
