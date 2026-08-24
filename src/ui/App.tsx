@@ -28,7 +28,18 @@ export function App() {
       [group]: prev[group].map((l) => (l.key === key ? { ...l, [bound]: value } : l)),
     }))
 
-  const costsEdited = costs !== DEFAULT_COSTS
+  // Compared by value, not reference: editing a figure back to its default
+  // should retire the reset control.
+  const costsEdited = useMemo(
+    () =>
+      (['transaction', 'moving'] as const).some((group) =>
+        costs[group].some((line, i) => {
+          const original = DEFAULT_COSTS[group][i]
+          return !original || line.low !== original.low || line.high !== original.high
+        }),
+      ),
+    [costs],
+  )
 
   // `today` is passed in rather than read inside the engine, so the engine stays
   // pure and every result is reproducible in a test.

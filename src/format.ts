@@ -40,13 +40,19 @@ export function formatRange(m: Money): string {
   return `${formatEuros(low)} – ${formatEuros(high)}`
 }
 
-export const formatMonth = (d: Date): string => monthYear.format(d)
+export const formatMonth = (d: Date): string =>
+  Number.isFinite(d.getTime()) ? monthYear.format(d) : 'Never at this rate'
 
 export function formatCountdown(c: Countdown): string {
   if (!c.reachable) return 'Never at this rate'
   if (c.months === 0) return 'Already saved'
   if (!c.date) return 'Already saved'
   return formatMonth(c.date)
+}
+
+/** Guards every figure that reaches a formatter, so a bad input cannot blank the page. */
+export function safeNumber(n: number): number {
+  return Number.isFinite(n) ? n : 0
 }
 
 export function formatMonths(months: number): string {

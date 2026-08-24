@@ -18,11 +18,23 @@ export function addMonths(from: Date, months: number): Date {
   return d
 }
 
+/**
+ * Beyond this, a date stops being information. It also keeps `addMonths` inside
+ * the range JS Date can represent — past it, Intl throws on an invalid date and
+ * takes the whole page down.
+ */
+const HORIZON_MONTHS = 1_200 // 100 years
+
 export function monthsTo(target: number, currentSavings: number, monthly: number): Countdown {
   const shortfall = Math.max(0, target - currentSavings)
   if (shortfall === 0) return { months: 0, reachable: true, date: null }
   if (monthly <= 0) return { months: Infinity, reachable: false, date: null }
-  return { months: Math.ceil(shortfall / monthly), reachable: true, date: null }
+
+  const months = Math.ceil(shortfall / monthly)
+  if (!Number.isFinite(months) || months > HORIZON_MONTHS) {
+    return { months: Infinity, reachable: false, date: null }
+  }
+  return { months, reachable: true, date: null }
 }
 
 export function countdownFor(

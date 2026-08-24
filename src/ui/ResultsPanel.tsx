@@ -56,6 +56,21 @@ function Compare({
   )
 }
 
+/**
+ * The largest sentence on the page, so it is the one that must not assume a
+ * refund. Above 90% LTV the deposit comes back; at 90% nothing does; below it
+ * the loan falls short and the gap is due in cash on the day.
+ */
+function headlineCopy(refund: number): string {
+  if (refund > 0) {
+    return 'What you need saved to get through the purchase — the deposit has to be sitting there on the day even though it comes back to you later.'
+  }
+  if (refund === 0) {
+    return 'What you need saved to get through the purchase. Nothing comes back at completion here: the loan covers exactly what is still owed and no more.'
+  }
+  return 'What you need saved to get through the purchase. Nothing comes back at completion — the loan falls short of what is owed, and the difference is due in cash on the day.'
+}
+
 function Headline({ r, variant }: { r: Result; variant: 'normal' | 'stressed' }) {
   return (
     <div>
@@ -65,7 +80,7 @@ function Headline({ r, variant }: { r: Result; variant: 'normal' | 'stressed' })
       <p className="mt-2 max-w-lg text-[0.9375rem] leading-snug text-ink-soft">
         {variant === 'stressed'
           ? 'What you would need if the flat is valued below what you agreed to pay. The bank lends against its own valuation, so a shortfall lands on you in cash.'
-          : 'What you need saved to get through the purchase — the deposit has to be sitting there on the day even though it comes back to you later.'}
+          : headlineCopy(r.refund)}
       </p>
     </div>
   )

@@ -119,8 +119,16 @@ until the repo has a remote and Pages is enabled.
 ### Before making this repo public
 
 The savings and monthly-saving fields deliberately default to **zero** rather
-than to real figures, and neither the source nor the tests carry them, so no
-household data enters git history from the app.
+than to real figures, and neither the source nor the tests carry them.
+
+Checking the working tree is not enough — `git grep` only sees the current
+checkout. An early commit in this repo did carry the real figures in a test
+fixture and a comment; that history was rewritten before any remote existed.
+Check history, not just the tip:
+
+```bash
+git log -p -S'<the balance>' -- src   # must return nothing
+```
 
 **The PRD file is the exception.** `PRD — Cash to Buy Calculator.md` is tracked
 here and states the real savings balance and both saving rates in its inputs

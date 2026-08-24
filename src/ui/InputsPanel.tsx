@@ -111,7 +111,7 @@ export function InputsPanel({
 
       <Field
         label={<Gloss id="float">Float — cash held back</Gloss>}
-        hint="Untouchable, so the gestoría can be paid before your deposit comes back."
+        hint="Untouchable, so the gestoría can be paid before completion, whatever the deposit does."
       >
         <EuroInput label="Float held back, in euros" value={inputs.float} onChange={(n) => set('float', n)} step={500} />
       </Field>

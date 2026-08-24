@@ -25,7 +25,8 @@ export function calculate(inputs: Inputs, costs: CostConstants, today: Date): Re
    * untouched — so at lower prices the arras binds, not the cost of the
    * transaction. That is why €330,000 answers €35,000 and not €33,000.
    */
-  const requirement = atLeast(maxOf([peakCash, allIn]), c.arras + inputs.float)
+  const float = Math.max(0, Number.isFinite(inputs.float) ? inputs.float : 0)
+  const requirement = atLeast(maxOf([peakCash, allIn]), c.arras + float)
 
   const transactionCosts = sum([
     exact(purchaseTax(inputs.price, inputs.propertyType)),
@@ -36,9 +37,12 @@ export function calculate(inputs: Inputs, costs: CostConstants, today: Date): Re
   ])
   const movingCosts = sum(costs.moving.map((l) => ({ low: l.low, high: l.high })))
 
-  const monthly = inputs.patrickMonthly + inputs.jennyMonthly
-  const toRequirement = countdownFor(requirement, inputs.currentSavings, monthly, today)
-  const toAllIn = countdownFor(allIn, inputs.currentSavings, monthly, today)
+  const nonNegative = (n: number) => Math.max(0, Number.isFinite(n) ? n : 0)
+  const savings = nonNegative(inputs.currentSavings)
+  const monthly = nonNegative(inputs.patrickMonthly) + nonNegative(inputs.jennyMonthly)
+
+  const toRequirement = countdownFor(requirement, savings, monthly, today)
+  const toAllIn = countdownFor(allIn, savings, monthly, today)
 
   /**
    * "Enough for everything including moving in" can land BEFORE "enough to

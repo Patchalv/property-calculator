@@ -4,7 +4,6 @@
  * discretionary ones are guesses and should be argued with.
  */
 
-import { DEFAULT_COSTS } from '../calc/constants'
 import { purchaseTax } from '../calc/tax'
 import type { CostConstants, CostLine, Inputs } from '../calc/types'
 import { formatEuros } from '../format'
@@ -162,5 +161,3 @@ export function CostBreakdown({
     </div>
   )
 }
-
-export const PRISTINE_COSTS = DEFAULT_COSTS

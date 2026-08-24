@@ -1,5 +1,11 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 
+/**
+ * Renders a real <label> only when it is given something to label. Several of
+ * these captions contain a tappable gloss, and interactive content inside a
+ * <label> is invalid HTML — the click target becomes ambiguous. Those cases get
+ * a plain <p>; the inputs they sit above carry their own aria-label.
+ */
 export function Field({
   label,
   hint,
@@ -11,11 +17,12 @@ export function Field({
   children: ReactNode
   htmlFor?: string
 }) {
+  const Caption = htmlFor ? 'label' : 'p'
   return (
     <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className="eyebrow block">
+      <Caption {...(htmlFor ? { htmlFor } : {})} className="eyebrow block">
         {label}
-      </label>
+      </Caption>
       {children}
       {hint && <p className="text-[0.8125rem] leading-snug text-ink-soft">{hint}</p>}
     </div>
@@ -62,6 +69,12 @@ export function EuroInput({
   )
 }
 
+/**
+ * A radio group is a single tab stop whose options are chosen with the arrow
+ * keys — roving tabindex, not four separate stops. Announcing "radio button,
+ * 2 of 4" and then ignoring the arrows the listener reaches for is worse than
+ * having no roles at all.
+ */
 export function Segmented<T extends string | number>({
   options,
   value,
@@ -73,16 +86,62 @@ export function Segmented<T extends string | number>({
   onChange: (v: T) => void
   label: string
 }) {
+  const group = useRef<HTMLDivElement>(null)
+  const selected = Math.max(
+    0,
+    options.findIndex((o) => o.value === value),
+  )
+
+  const move = (delta: number) => {
+    const next = (selected + delta + options.length) % options.length
+    const option = options[next]
+    if (!option) return
+    onChange(option.value)
+    // Selection follows focus, so the newly chosen option takes the tab stop.
+    const buttons = group.current?.querySelectorAll('button')
+    buttons?.[next]?.focus()
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault()
+        move(1)
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault()
+        move(-1)
+        break
+      case 'Home':
+        e.preventDefault()
+        move(-selected)
+        break
+      case 'End':
+        e.preventDefault()
+        move(options.length - 1 - selected)
+        break
+    }
+  }
+
   return (
-    <div role="radiogroup" aria-label={label} className="flex border border-rule-firm">
+    <div
+      ref={group}
+      role="radiogroup"
+      aria-label={label}
+      onKeyDown={onKeyDown}
+      className="flex border border-rule-firm"
+    >
       {options.map((o, i) => {
-        const active = o.value === value
+        const active = i === selected
         return (
           <button
             key={String(o.value)}
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(o.value)}
             className={`flex-1 px-2 py-2 text-[0.8125rem] font-semibold transition-colors ${
               i > 0 ? 'border-l border-rule-firm' : ''

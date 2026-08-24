@@ -14,6 +14,7 @@
  * waterfall handles that without a custom renderer anyway.
  */
 
+import { useId } from 'react'
 import type { Money, TimelineRow } from '../calc/types'
 import { formatEuros } from '../format'
 
@@ -60,6 +61,9 @@ export function Waterfall({
   refund: number
 }) {
   const completion = completionLook(refund)
+  // Two of these render side by side under the stress test, so the pattern id
+  // cannot be a constant.
+  const hatchId = useId()
   if (rows.length === 0) return null
 
   const running = rows.map((r) => r.running[bound])
@@ -113,7 +117,7 @@ export function Waterfall({
       >
         <defs>
           <pattern
-            id="floatHatch"
+            id={hatchId}
             width="6"
             height="6"
             patternTransform="rotate(45)"
@@ -152,7 +156,7 @@ export function Waterfall({
               y={y(base + float)}
               width={barW}
               height={Math.max(2, y(base) - y(base + float))}
-              fill="url(#floatHatch)"
+              fill={`url(#${hatchId})`}
               stroke="var(--color-gold)"
               strokeWidth="0.75"
               strokeOpacity="0.5"
@@ -259,7 +263,7 @@ export function Waterfall({
         <Key swatch="var(--color-gold)">Cash out</Key>
         {refund > 0 && <Key swatch="var(--color-verde)">Deposit refunded</Key>}
         <Key swatch="#9a8391">Moving in</Key>
-        <Key hatched>Float — held, never spent</Key>
+        {float > 0 && <Key hatched>Float — held, never spent</Key>}
       </figcaption>
     </figure>
   )

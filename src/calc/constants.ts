@@ -11,7 +11,13 @@ import type { CostConstants, CostLine, Inputs } from './types'
 
 /** Rendered visibly in the UI as "Figures as of August 2026". */
 export const AS_OF = '2026-08-23'
-export const AS_OF_LABEL = 'August 2026'
+
+/** Derived, so the date and the label it renders as cannot drift apart. */
+export const AS_OF_LABEL = new Intl.DateTimeFormat('en-GB', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+}).format(new Date(`${AS_OF}T00:00:00Z`))
 
 // ---------------------------------------------------------------------------
 // Tax rates

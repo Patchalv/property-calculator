@@ -19,13 +19,20 @@ export interface Core {
 }
 
 export function core(inputs: Inputs, stressFactor: number): Core {
-  const { price, ltv, arrasMode, arrasValue, stressAppraisal } = inputs
+  const { ltv, arrasMode, arrasValue, stressAppraisal } = inputs
+
+  // Number inputs can hand us negatives and NaN, and a euro arras can outrun
+  // the price after the price is lowered. Clamped here rather than at each
+  // control, so no caller can construct an impossible state.
+  const price = Math.max(0, Number.isFinite(inputs.price) ? inputs.price : 0)
 
   // The appraisal is ASSUMED equal to price unless the stress test is on. This
   // is the least safe assumption in the model, taken deliberately.
   const appraisal = stressAppraisal ? price * stressFactor : price
 
-  const arras = arrasMode === 'percent' ? price * (arrasValue / 100) : arrasValue
+  const rawArras = arrasMode === 'percent' ? price * (arrasValue / 100) : arrasValue
+  // An arras above the price is not a deposit, and would invert owedAtCompletion.
+  const arras = Math.min(price, Math.max(0, Number.isFinite(rawArras) ? rawArras : 0))
 
   // The bank sizes the loan on the FULL purchase price, not on what is left
   // after the arras — which is the whole reason a refund exists.
