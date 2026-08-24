@@ -34,7 +34,10 @@ export function Gloss({ id, children }: { id: keyof typeof GLOSSARY; children?: 
       // Keep it on screen: flip above when there is no room below, and pull
       // back from the right edge rather than overflowing it.
       const below = t.bottom + 8
-      const top = below + height > window.innerHeight - 8 && t.top > height + 16 ? t.top - height - 8 : below
+      const flipped = below + height > window.innerHeight - 8 && t.top > height + 16
+      // Clamped to the viewport as a last resort: a panel the reader cannot see
+      // is worse than one that has drifted from its trigger.
+      const top = Math.max(8, flipped ? t.top - height - 8 : below)
       const left = Math.max(16, Math.min(t.left, window.innerWidth - width - 16))
       setPos({ top, left })
     }
