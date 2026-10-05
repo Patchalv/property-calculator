@@ -189,6 +189,15 @@ export function InputsPanel({
           hint="Adds €1,000–€2,500. Your own solicitor, separate from the seller’s and the bank’s."
         />
       </div>
+
+      <div className="border-t border-rule pt-6">
+        <Toggle
+          checked={inputs.under40Rate}
+          onChange={(v) => set('under40Rate', v)}
+          label="Use the under-40 tax rate"
+          hint="Transfer tax 4% instead of 6% up to €450,000, and lower stamp duty on new build. Announced 5 October 2026 for the 2027 budget. Not law yet."
+        />
+      </div>
     </form>
   )
 }

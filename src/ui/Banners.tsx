@@ -10,7 +10,7 @@
  * warning that needs an interaction to parse is a warning that does not land.
  */
 
-import { AS_OF_LABEL, MPV_PRICE_CAP } from '../calc/constants'
+import { AS_OF_LABEL, MPV_PRICE_CAP, UNDER_40_ITP_PRICE_CAP } from '../calc/constants'
 import { formatEuros } from '../format'
 
 function StampHeading({ children }: { children: React.ReactNode }) {
@@ -72,6 +72,40 @@ export function SchemeBanner({ ltv, price }: { ltv: number; price: number }) {
           </span>{' '}
           A 2026 draft Order reports €425,000 with financing tiered 100/95/90 by age band, but it is
           not law and its price cap has never been confirmed against a primary text.
+        </p>
+      )}
+    </aside>
+  )
+}
+
+export function Under40Banner({
+  on,
+  price,
+  resale,
+}: {
+  on: boolean
+  price: number
+  resale: boolean
+}) {
+  if (!on) return null
+  const overCap = resale && price > UNDER_40_ITP_PRICE_CAP
+
+  return (
+    <aside className="stamp p-4 sm:p-5">
+      <StampHeading>Tax rate · announced, not law</StampHeading>
+      <p>
+        Uses the under-40 rates the Comunidad de Madrid announced on 5 October 2026: transfer tax at
+        4% instead of 6% on a second-hand home up to {formatEuros(UNDER_40_ITP_PRICE_CAP)}, and
+        stamp duty on a new-build at 0.4% instead of 0.75%. They go into the 2027 regional budget,
+        which has not passed. A purchase completed before the law takes effect pays the old rates.
+      </p>
+      {overCap && (
+        <p className="mt-3 border-t border-stamp-ink/25 pt-3">
+          <span className="font-semibold text-gold">
+            Above the {formatEuros(UNDER_40_ITP_PRICE_CAP)} cap.
+          </span>{' '}
+          The full 6% applies at this price. How the cap works is not yet published; this assumes
+          one euro over loses the whole cut.
         </p>
       )}
     </aside>

@@ -44,6 +44,11 @@ export interface Inputs {
    * purchase price instead of assuming it appraises at or above it.
    */
   stressAppraisal: boolean
+  /**
+   * Apply the announced under-40 rates (ITP 4% up to €450,000, AJD 0.4% on new
+   * build). Announced 5 October 2026, not yet law — see ITP_RATE_UNDER_40.
+   */
+  under40Rate: boolean
 }
 
 /** One editable cost line. Every figure here is a default, not a fixed value. */

@@ -13,13 +13,14 @@ import type { Inputs, Ltv, PropertyType } from './types'
 
 /**
  * Fixed settings for the golden table: 100% LTV, 10% arras, €2,000 float,
- * lawyer off, resale. `independentLawyer` is pinned explicitly rather than
+ * lawyer off, resale, today's 6% ITP (`under40Rate` off — the under-40 cut is
+ * announced, not law, and these figures predate it). `independentLawyer` is pinned explicitly rather than
  * inherited from `DEFAULT_INPUTS` — the UI's own default is a household
  * choice that can change independently of this fixture, and this table must
  * not drift with it.
  */
 function goldenInputs(price: number, over: Partial<Inputs> = {}): Inputs {
-  return { ...DEFAULT_INPUTS, price, independentLawyer: false, ...over }
+  return { ...DEFAULT_INPUTS, price, independentLawyer: false, under40Rate: false, ...over }
 }
 
 const at = (price: number, over: Partial<Inputs> = {}) =>

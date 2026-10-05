@@ -29,7 +29,7 @@ export function calculate(inputs: Inputs, costs: CostConstants, today: Date): Re
   const requirement = atLeast(maxOf([peakCash, allIn]), c.arras + float)
 
   const transactionCosts = sum([
-    exact(purchaseTax(inputs.price, inputs.propertyType)),
+    exact(purchaseTax(inputs.price, inputs.propertyType, inputs.under40Rate)),
     ...activeTransactionLines(costs, inputs.independentLawyer).map((l) => ({
       low: l.low,
       high: l.high,

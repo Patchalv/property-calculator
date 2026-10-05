@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { CostConstants, Inputs, Result } from '../calc/types'
 import { formatCountdown, formatMonths, formatRange, formatSigned } from '../format'
-import { AppraisalBanner, LeyBanner, SchemeBanner, StalenessNote } from './Banners'
+import { AppraisalBanner, LeyBanner, SchemeBanner, StalenessNote, Under40Banner } from './Banners'
 import { CostBreakdown } from './CostBreakdown'
 import { Gloss } from './Gloss'
 import { TimelineTable } from './TimelineTable'
@@ -311,6 +311,7 @@ export function ResultsDetail({
         <div className="space-y-4">
           <AppraisalBanner stressed={on} onToggle={onToggleStress} />
           <SchemeBanner ltv={inputs.ltv} price={inputs.price} />
+          <Under40Banner on={inputs.under40Rate} price={inputs.price} resale={inputs.propertyType === 'resale'} />
           <LeyBanner />
           <StalenessNote />
         </div>

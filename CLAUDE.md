@@ -59,6 +59,8 @@ Showing only one of these misleads in a predictable direction. The headline `req
 
 Spanish terms (arras, ITP, IVA+AJD, tasación, gestoría) are defined in the PRD's domain-model table. **Every one needs a plain-English gloss in the UI** — one of the two users has never encountered them. Glosses live in `src/ui/glossary.ts` and render through the tappable `Gloss` component, not a hover tooltip: hover does not exist on the phone layout. **The headline and the three warning banners are exempt** — they are written in plain English with no gated terms, because a warning that needs a tap to parse is a warning that does not land.
 
+**The under-40 rate is announced, not law.** On 5 October 2026 the Comunidad de Madrid announced ITP at 4% (from 6%) on a resale home up to €450,000 and AJD at 0.4% (from 0.75%) on new build, for buyers under 40, in the 2027 budget law. `under40Rate` applies it, and is on by default because the household qualifies and buys after the likely start date. The golden fixture and `engine.test.ts` pin it off, so they keep describing today's law; `under40.test.ts` covers the cut. The €450,000 cap is modelled as a cliff because the rule is not yet published. When the law passes, or the bill changes the numbers, update `ITP_RATE_UNDER_40` and its neighbours and the banner copy.
+
 ## Golden tests are the acceptance criteria
 
 The PRD's tables reproduce figures from the source vault; they make the engine verifiable rather than merely plausible. Two things to know before debugging a mismatch:

@@ -27,7 +27,7 @@ export const GLOSSARY: Record<string, GlossEntry> = {
   },
   itp: {
     term: 'ITP',
-    short: 'Transfer tax on a second-hand flat. In Madrid, a flat 6%.',
+    short: 'Transfer tax on a second-hand flat. In Madrid, 6% — or 4% for under-40s up to €450,000 if the announced 2027 cut becomes law.',
     body: 'Impuesto de Transmisiones Patrimoniales. Charged on resale property only, and usually the largest single line in the whole purchase. A new-build pays VAT and stamp duty instead, which costs meaningfully more.',
   },
   iva: {

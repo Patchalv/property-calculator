@@ -9,8 +9,10 @@ import { DEFAULT_COSTS, DEFAULT_INPUTS, MOVING_COSTS } from './constants'
 import type { CostConstants, Inputs } from './types'
 
 const TODAY = new Date('2026-08-23T00:00:00Z')
+// Under-40 rate pinned off: these tests describe the law as it stands. The
+// announced cut has its own file, under40.test.ts.
 const at = (over: Partial<Inputs> = {}, costs: CostConstants = DEFAULT_COSTS) =>
-  calculate({ ...DEFAULT_INPUTS, ...over }, costs, TODAY)
+  calculate({ ...DEFAULT_INPUTS, under40Rate: false, ...over }, costs, TODAY)
 
 describe('timeline shape', () => {
   it('puts tasación and gestoría in their own rows BEFORE completion', () => {

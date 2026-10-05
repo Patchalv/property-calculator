@@ -79,7 +79,7 @@ export function buildTimeline(
   const preCompletion = new Set<string>(PRE_COMPLETION_KEYS)
   const atCompletion = lines
     .filter((l) => !preCompletion.has(l.key))
-    .reduce<Money>((acc, l) => add(acc, asMoney(l)), exact(purchaseTax(inputs.price, inputs.propertyType)))
+    .reduce<Money>((acc, l) => add(acc, asMoney(l)), exact(purchaseTax(inputs.price, inputs.propertyType, inputs.under40Rate)))
 
   // The label has to track the refund's sign. Below 90% LTV nothing comes back
   // and there is a shortfall to find instead, so "less the arras refund" would

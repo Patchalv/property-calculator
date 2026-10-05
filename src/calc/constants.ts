@@ -30,6 +30,21 @@ export const AS_OF_LABEL = new Intl.DateTimeFormat('en-GB', {
  */
 export const ITP_RATE = 0.06
 
+/**
+ * The under-40 cut, ANNOUNCED, NOT LAW. Comunidad de Madrid press release of
+ * 5 October 2026: ITP 4% on a resale vivienda habitual up to €450,000, and AJD
+ * on new build down to 0.4%, both for buyers under 40, carried in the 2027
+ * regional budget law. Likely in force from 1 January 2027; not confirmed.
+ * Source: Madrid Under-40 Purchase Tax Cut — 2027 Budget Status, 2026-10-05.
+ *
+ * The release says nothing on how the €450,000 cap works. Modelled as a cliff,
+ * like the existing €250,000 bonificación: above the cap, the full 6% applies.
+ * The release gives no cap for the AJD cut, so none is applied.
+ */
+export const ITP_RATE_UNDER_40 = 0.04
+export const UNDER_40_ITP_PRICE_CAP = 450_000
+export const AJD_RATE_UNDER_40 = 0.004
+
 /** IVA — VAT on NEW-BUILD property, 10%. Paid instead of ITP, plus AJD below. */
 export const IVA_RATE = 0.1
 
@@ -170,4 +185,7 @@ export const DEFAULT_INPUTS: Inputs = {
   jennyMonthly: 1_227.27,
   independentLawyer: true,
   stressAppraisal: false,
+  // On by default: both buyers are under 40 and the purchase window is after
+  // the cut's likely start date. Flip it off for the law as it stands today.
+  under40Rate: true,
 }

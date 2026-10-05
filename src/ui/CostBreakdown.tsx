@@ -4,7 +4,7 @@
  * discretionary ones are guesses and should be argued with.
  */
 
-import { purchaseTax } from '../calc/tax'
+import { itpRate, purchaseTax } from '../calc/tax'
 import type { CostConstants, CostLine, Inputs } from '../calc/types'
 import { formatEuros } from '../format'
 import { Gloss } from './Gloss'
@@ -83,7 +83,7 @@ export function CostBreakdown({
   onReset: () => void
   isEdited: boolean
 }) {
-  const tax = purchaseTax(inputs.price, inputs.propertyType)
+  const tax = purchaseTax(inputs.price, inputs.propertyType, inputs.under40Rate)
   const shownTransaction = costs.transaction.filter(
     (l) => l.key !== 'lawyer' || inputs.independentLawyer,
   )
@@ -111,7 +111,7 @@ export function CostBreakdown({
           <tr className="border-b border-rule/60">
             <th scope="row" className="py-1.5 pr-3 text-left text-[0.875rem] font-normal">
               {inputs.propertyType === 'resale' ? (
-                <Gloss id="itp">ITP — transfer tax, 6%</Gloss>
+                <Gloss id="itp">{`ITP — transfer tax, ${Math.round(itpRate(inputs.price, inputs.under40Rate) * 100)}%`}</Gloss>
               ) : (
                 <Gloss id="iva">IVA 10% + AJD stamp duty</Gloss>
               )}
